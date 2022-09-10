@@ -2,8 +2,9 @@
   "name": "dyblog",
   "version": "1.0.0",
   "description": "A blog application",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,6 +33,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.4",
     "nanoid": "^4.0.0",
+    "nodemon": "^2.0.19",
     "swagger-ui-express": "^4.5.0",
     "xss-clean": "^0.1.1",
     "yamljs": "^0.3.0"
