@@ -31,3 +31,27 @@ const sendBulkMail = async (req, res) => {
     res.status(StatusCodes.OK).json({ message: "mail sent successfully" });
   });
 };
+
+const sendSingleMail = async (req, res) => {
+  const { subject, mbody, mtitle } = req.body;
+
+  const mailOptions = {
+    from: process.env.user,
+    to: "to be retrieved from db later",
+    subject: subject,
+    html: `
+      <h1>Welcome ${mtitle}</h1>
+      <p>The ${mbody}</p>
+   `,
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    res.status(StatusCodes.OK).json({ message: "mail sent successfully" });
+  });
+};
+
+module.exports = { sendBulkMail, sendSingleMail };
