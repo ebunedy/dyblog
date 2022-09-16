@@ -18,6 +18,20 @@ const postModel = Schema({
   image: {
     type: String,
   },
+  categories: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+  ],
+  tags: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Tag",
+      required: true,
+    },
+  ],
   postedBy: {
     type: Schema.Types.ObjectId,
     required: true,
