@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 const { model, Schema } = mongoose;
 
@@ -35,6 +36,11 @@ const userModel = Schema(
         validator: validator.isEmail,
         message: "please provide correct email",
       },
+    },
+    password: {
+      type: String,
+      minLength: 8,
+      required: [true, "please provide password"],
     },
     following: [
       {
@@ -81,5 +87,15 @@ const userModel = Schema(
 );
 
 userModel.index({ following: 1, followers: 1 }, { unique: true });
+
+userModel.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+/** compare password  */
+userModel.methods.comparePasswords = async function (userPassword) {
+  return await bcrypt.compare(userPassword, this.password);
+};
 
 module.exports = model("User", userModel);

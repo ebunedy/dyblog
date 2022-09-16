@@ -4,19 +4,12 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-app.use(cookieParser("secret"));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser(process.env.JWT_APP_SECRET));
 
 app.get("/", (req, res) => {
   const cookie = req.signedCookies.name;
   res.send(cookie);
-});
-
-app.get("/cookie", (req, res) => {
-  res.cookie("name", req.params.name, {
-    expires: new Date(Date.now() + 1000),
-    signed: true,
-  });
-  res.send("cookie set");
 });
 
 const PORT = 3000;
