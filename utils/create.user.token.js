@@ -1,8 +1,8 @@
 const userToken = (user) => {
   return {
-    firstname: user.first_name,
+    username: user.username,
     userId: user._id,
   };
 };
 
-module.exports = userToken
+module.exports = userToken;

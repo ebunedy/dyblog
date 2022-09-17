@@ -8,6 +8,14 @@ const commentSchema = Schema(
       type: String,
       required: [true, "please provide your comment"],
     },
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

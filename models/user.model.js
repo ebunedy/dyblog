@@ -6,14 +6,14 @@ const { model, Schema } = mongoose;
 
 const userModel = Schema(
   {
-    first_name: {
+    firstName: {
       type: String,
       required: [true, "please provide first name"],
       minLength: 3,
       maxLength: 32,
       trim: true,
     },
-    last_name: {
+    lastName: {
       type: String,
       required: [true, "please provide first name"],
       minLength: 3,
