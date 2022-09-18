@@ -3,8 +3,8 @@ const {
   addTokenToCookie,
   decodeToken,
   createToken,
-  createPassResetToken,
-  decodePassResetToken,
+  createPreAndResetToken,
+  decodePreAndResetToken,
 } = require("./user.jwt");
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
   decodeToken,
   createToken,
   addTokenToCookie,
-  createPassResetToken,
+  createPreAndResetToken,
   userResetPasswordToken,
-  decodePassResetToken,
+  decodePreAndResetToken,
 };

@@ -13,14 +13,14 @@ const decodeToken = (token) => {
 };
 
 /** verify password reset token */
-const decodePassResetToken = (token) => {
+const decodePreAndResetToken = (token) => {
   return jsonwebtoken.verify(token, process.env.PASS_RESET_SECRET);
 };
 
 /** create password reset token */
-const createPassResetToken = ({ payload }) => {
-  return jsonwebtoken.sign(payload, process.env.PASS_RESET_SECRET, {
-    expiresIn: process.env.PASS_RESET_SECRET_EXPIRATION,
+const createPreAndResetToken = ({ payload }) => {
+  return jsonwebtoken.sign(payload, process.env.RESET_PRE_SECRET, {
+    expiresIn: process.env.RESET_PRE_SECRET_EXPIRATION,
   });
 };
 
@@ -40,6 +40,6 @@ module.exports = {
   addTokenToCookie,
   decodeToken,
   createToken,
-  createPassResetToken,
-  decodePassResetToken,
+  createPreAndResetToken,
+  decodePreAndResetToken,
 };
