@@ -12,6 +12,18 @@ const decodeToken = (token) => {
   return jsonwebtoken.verify(token, process.env.JWT_APP_SECRET);
 };
 
+/** verify password reset token */
+const decodePassResetToken = (token) => {
+  return jsonwebtoken.verify(token, process.env.PASS_RESET_SECRET);
+};
+
+/** create password reset token */
+const createPassResetToken = ({ payload }) => {
+  return jsonwebtoken.sign(payload, process.env.PASS_RESET_SECRET, {
+    expiresIn: process.env.PASS_RESET_SECRET_EXPIRATION,
+  });
+};
+
 /** add token to cookie */
 const addTokenToCookie = ({ res, user }) => {
   const token = createToken({ payload: user });
@@ -24,4 +36,10 @@ const addTokenToCookie = ({ res, user }) => {
   });
 };
 
-module.exports = { addTokenToCookie, decodeToken, createToken };
+module.exports = {
+  addTokenToCookie,
+  decodeToken,
+  createToken,
+  createPassResetToken,
+  decodePassResetToken,
+};

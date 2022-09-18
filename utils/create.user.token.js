@@ -5,4 +5,10 @@ const userToken = (user) => {
   };
 };
 
-module.exports = userToken;
+const userResetPasswordToken = (user) => {
+  return {
+    username: user.email,
+  };
+};
+
+module.exports = { userToken, userResetPasswordToken };

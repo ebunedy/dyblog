@@ -75,6 +75,9 @@ const userModel = Schema(
     twitter: {
       type: String,
     },
+    photo: {
+      type: String,
+    },
     roles: {
       type: String,
       required: [true, "please provide a role"],

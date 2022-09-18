@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(process.env.JWT_APP_SECRET));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.get("/", (req, res) => {
   const cookie = req.signedCookies.name;
