@@ -5,7 +5,7 @@ const { StatusCodes } = require("http-status-codes");
 const transporter = nodemail.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.user,
+    user: process.env.mail,
     pass: process.env.pass,
   },
 });
@@ -14,7 +14,7 @@ const sendBulkMail = async (req, res) => {
   const { subject, mbody, mtitle } = req.body;
 
   const mailOptions = {
-    from: process.env.user,
+    from: process.env.mail,
     to: "to be retrieved from db later",
     subject: subject,
     html: `
@@ -36,7 +36,7 @@ const sendSingleMail = async (req, res) => {
   const { subject, mbody, mtitle } = req.body;
 
   const mailOptions = {
-    from: process.env.user,
+    from: process.env.mail,
     to: "to be retrieved from db later",
     subject: subject,
     html: `
