@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const nodemail = require("nodemailer");
+const { StatusCodes } = require("http-status-codes");
 const { NotFoundError, BadrequestError } = require("../errors/index");
 const {
   createToken,
@@ -21,9 +22,14 @@ const preSignUp = async (req, res) => {
 
   const transporter = nodemail.createTransport({
     service: "gmail",
+    secure: false, // use SSL
+    port: 25, // port for secure SMTP
     auth: {
       user: process.env.mail,
       pass: process.env.pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 
@@ -36,7 +42,7 @@ const preSignUp = async (req, res) => {
     <p>${process.env.CLIENT_URL}/auth/account/activate/${preToken}</p>
     <hr />
     <p>This email may contain sensitive information</p>
-    <p>https://domain.com</p>
+    <p>https://dyblog.com</p>
    `,
   };
 
@@ -48,3 +54,5 @@ const preSignUp = async (req, res) => {
     res.status(StatusCodes.OK).json({ message: "mail sent successfully" });
   });
 };
+
+module.exports = { preSignUp };
