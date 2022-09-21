@@ -9,6 +9,7 @@ const {
   addTokenToCookie,
   createPreAndResetToken,
   decodePreAndResetToken,
+  userToken,
 } = require("../utils/index");
 
 const preSignUp = async (req, res) => {
@@ -76,15 +77,30 @@ const signup = async (req, res) => {
   const { name, email, username, password, role } = regBody;
   const user = await User.create({ name, email, username, password });
   const tokenForUser = userToken(user);
-  const userToken = createToken({ payload: tokenForUser });
-  addTokenToCookie({ res, user: userToken });
-  res
-    .status(StatusCodes.CREATED)
-    .json({ msg: "user created", token: userToken });
+  //const userToken = createToken({ payload: tokenForUser });
+  addTokenToCookie({ res, user: tokenForUser });
+  res.status(StatusCodes.CREATED).json({ msg: "user created" });
 };
 
 const login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadrequestError("provide login details");
+  }
 
-}
+  const user = await User.findOne({ email }).select("username name");
 
-module.exports = { preSignUp };
+  if (!user) {
+    throw new NotFoundError("user not found. please register as a new user");
+  }
+  const verifyPassword = await user.comparePasswords(password);
+  if (!verifyPassword) {
+    throw new BadrequestError("invalid password");
+  }
+  const userToken = userToken(user);
+  //const token = createToken({ payload: userToken });
+  addTokenToCookie({ res, user: userToken });
+  res.status(StatusCodes.OK).json({ msg: "login successful" });
+};
+
+module.exports = { preSignUp, signup, login };
