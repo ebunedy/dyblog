@@ -71,7 +71,7 @@ const userModel = Schema(
     photo: {
       type: String,
     },
-    roles: {
+    role: {
       type: String,
       required: [true, "please provide a role"],
       enum: ["admin", "user"],

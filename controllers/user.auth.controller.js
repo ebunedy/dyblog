@@ -3,7 +3,10 @@ const nodemail = require("nodemailer");
 const { StatusCodes } = require("http-status-codes");
 const { NotFoundError, BadrequestError } = require("../errors/index");
 const {
+  userToken,
   createToken,
+  decodeToken,
+  addTokenToCookie,
   createPreAndResetToken,
   decodePreAndResetToken,
 } = require("../utils/index");
@@ -54,5 +57,34 @@ const preSignUp = async (req, res) => {
     res.status(StatusCodes.OK).json({ message: "mail sent successfully" });
   });
 };
+
+const signup = async (req, res) => {
+  const regToken = req.body.token;
+  if (!regToken) {
+    throw new BadrequestError("no registration token found");
+  }
+
+  const regBody = decodePreAndResetToken(regToken);
+  if (!regBody) {
+    throw new BadrequestError("expired registration token");
+  }
+
+  const isFirstUser = (await User.countDocuments({})) === 0;
+  const userRole = isFirstUser ? "admin" : "user";
+  regBody.role = userRole;
+
+  const { name, email, username, password, role } = regBody;
+  const user = await User.create({ name, email, username, password });
+  const tokenForUser = userToken(user);
+  const userToken = createToken({ payload: tokenForUser });
+  addTokenToCookie({ res, user: userToken });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ msg: "user created", token: userToken });
+};
+
+const login = async (req, res) => {
+
+}
 
 module.exports = { preSignUp };
