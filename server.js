@@ -21,3 +21,5 @@ cnonnectDb();
 app.listen(PORT, () => {
   console.log(`app listening on ${PORT}`);
 });
+
+module.exports = app;

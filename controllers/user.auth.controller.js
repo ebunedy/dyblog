@@ -9,7 +9,6 @@ const {
   addTokenToCookie,
   createPreAndResetToken,
   decodePreAndResetToken,
-  userToken,
 } = require("../utils/index");
 
 const preSignUp = async (req, res) => {
@@ -101,6 +100,15 @@ const login = async (req, res) => {
   //const token = createToken({ payload: userToken });
   addTokenToCookie({ res, user: userToken });
   res.status(StatusCodes.OK).json({ msg: "login successful" });
+};
+
+const logout = (req, res) => {
+  res.cookie("token", "log out user", {
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000),
+  });
+  res.status(StatusCodes.OK).json({ message: "user logged out" });
+  //res.clearCookie("token");
 };
 
 module.exports = { preSignUp, signup, login };
