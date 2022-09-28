@@ -24,20 +24,7 @@ const createPreAndResetToken = ({ payload }) => {
   });
 };
 
-/** add token to cookie */
-const addTokenToCookie = ({ res, user }) => {
-  const token = createToken({ payload: user });
-  const cookieExpiration = 1000 * 60 * 60;
-  res.cookie("token", token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + cookieExpiration),
-    secure: process.env.NODE_ENV === "production",
-    signed: true,
-  });
-};
-
 module.exports = {
-  addTokenToCookie,
   decodeToken,
   createToken,
   createPreAndResetToken,

@@ -4,9 +4,6 @@ const { StatusCodes } = require("http-status-codes");
 const { NotFoundError, BadrequestError } = require("../errors/index");
 const {
   userToken,
-  createToken,
-  decodeToken,
-  addTokenToCookie,
   createPreAndResetToken,
   decodePreAndResetToken,
 } = require("../utils/index");
@@ -75,9 +72,6 @@ const signup = async (req, res) => {
 
   const { name, email, username, password, role } = regBody;
   const user = await User.create({ name, email, username, password });
-  const tokenForUser = userToken(user);
-  //const userToken = createToken({ payload: tokenForUser });
-  addTokenToCookie({ res, user: tokenForUser });
   res.status(StatusCodes.CREATED).json({ msg: "user created" });
 };
 
@@ -96,19 +90,7 @@ const login = async (req, res) => {
   if (!verifyPassword) {
     throw new BadrequestError("invalid password");
   }
-  const userToken = userToken(user);
-  //const token = createToken({ payload: userToken });
-  addTokenToCookie({ res, user: userToken });
   res.status(StatusCodes.OK).json({ msg: "login successful" });
-};
-
-const logout = (req, res) => {
-  res.cookie("token", "log out user", {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000),
-  });
-  res.status(StatusCodes.OK).json({ message: "user logged out" });
-  //res.clearCookie("token");
 };
 
 module.exports = { preSignUp, signup, login };

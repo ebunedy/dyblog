@@ -1,6 +1,5 @@
 const { userToken, userResetPasswordToken } = require("./create.user.token");
 const {
-  addTokenToCookie,
   decodeToken,
   createToken,
   createPreAndResetToken,
@@ -11,7 +10,6 @@ module.exports = {
   userToken,
   decodeToken,
   createToken,
-  addTokenToCookie,
   createPreAndResetToken,
   userResetPasswordToken,
   decodePreAndResetToken,
