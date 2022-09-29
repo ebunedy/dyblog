@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const nodemail = require("nodemailer");
 const { StatusCodes } = require("http-status-codes");
+const passport = require("passport");
 const { NotFoundError, BadrequestError } = require("../errors/index");
 const {
   userToken,
@@ -71,26 +72,37 @@ const signup = async (req, res) => {
   regBody.role = userRole;
 
   const { name, email, username, password, role } = regBody;
-  const user = await User.create({ name, email, username, password });
+  const user = await User.create({ name, email, username, password, role });
   res.status(StatusCodes.CREATED).json({ msg: "user created" });
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    throw new BadrequestError("provide login details");
-  }
-
-  const user = await User.findOne({ email }).select("username name");
-
-  if (!user) {
-    throw new NotFoundError("user not found. please register as a new user");
-  }
-  const verifyPassword = await user.comparePasswords(password);
-  if (!verifyPassword) {
-    throw new BadrequestError("invalid password");
-  }
-  res.status(StatusCodes.OK).json({ msg: "login successful" });
+const login = async (req, res, next) => {
+  passport.authenticate("login", async (err, user) => {
+    try {
+      if (err || !user) {
+        const error = new BadrequestError(
+          "no user found please register as a user"
+        );
+        next(error);
+      }
+      req.login(user, async (error) => {
+        if (error) return next(error);
+        res.json({
+          message: "user logged in successfully",
+          name: req.user.name,
+        });
+      });
+    } catch (error) {
+      next(error);
+    }
+  })(req, res, next);
 };
 
-module.exports = { preSignUp, signup, login };
+const logout = (req, res) => {
+  if (req.session) {
+    res.destroy();
+  }
+  res.json({ message: "user logged out successfully" });
+};
+
+module.exports = { preSignUp, signup, login, logout };
