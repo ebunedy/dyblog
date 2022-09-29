@@ -7,6 +7,7 @@ const {
   userToken,
   createPreAndResetToken,
   decodePreAndResetToken,
+  createToken,
 } = require("../utils/index");
 
 const preSignUp = async (req, res) => {
@@ -56,8 +57,9 @@ const preSignUp = async (req, res) => {
   });
 };
 
-const signup = async (req, res) => {
-  const regToken = req.body.token;
+const userRegistration = async (req, res) => {
+  /** the commmented code is for preregistration functionality */
+  /*const regToken = req.body.token;
   if (!regToken) {
     throw new BadrequestError("no registration token found");
   }
@@ -65,18 +67,21 @@ const signup = async (req, res) => {
   const regBody = decodePreAndResetToken(regToken);
   if (!regBody) {
     throw new BadrequestError("expired registration token");
-  }
-
+  }*/
   const isFirstUser = (await User.countDocuments({})) === 0;
   const userRole = isFirstUser ? "admin" : "user";
-  regBody.role = userRole;
+  req.body.role = userRole;
+  console.log(req.body);
 
-  const { name, email, username, password, role } = regBody;
-  const user = await User.create({ name, email, username, password, role });
-  res.status(StatusCodes.CREATED).json({ msg: "user created" });
+  //regBody.role = userRole; //preregistration functionality
+
+  const user = await User.create(req.body);
+  res
+    .status(StatusCodes.CREATED)
+    .json({ msg: "user created", name: user.name });
 };
 
-const login = async (req, res, next) => {
+const userLogin = async (req, res, next) => {
   passport.authenticate("login", async (err, user) => {
     try {
       if (err || !user) {
@@ -87,9 +92,11 @@ const login = async (req, res, next) => {
       }
       req.login(user, async (error) => {
         if (error) return next(error);
+        const userInfoToken = userToken(user);
+        const token = createToken({ payload: userInfoToken });
         res.json({
           message: "user logged in successfully",
-          name: req.user.name,
+          token,
         });
       });
     } catch (error) {
@@ -98,11 +105,4 @@ const login = async (req, res, next) => {
   })(req, res, next);
 };
 
-const logout = (req, res) => {
-  if (req.session) {
-    res.destroy();
-  }
-  res.json({ message: "user logged out successfully" });
-};
-
-module.exports = { preSignUp, signup, login, logout };
+module.exports = { preSignUp, userRegistration, userLogin };

@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 
 const { model, Schema } = mongoose;
+const ObjectId = Schema.ObjectId;
 
 const commentSchema = Schema(
   {
+    id: ObjectId,
     comment: {
       type: String,
       required: [true, "please provide your comment"],

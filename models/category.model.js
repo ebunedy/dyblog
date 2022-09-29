@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const { model, Schema } = mongoose;
+const ObjectId = Schema.ObjectId;
 
 const categorySchema = Schema(
   {
+    id: ObjectId,
     name: {
       type: String,
       trim: true,

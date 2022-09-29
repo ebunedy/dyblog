@@ -1,7 +1,7 @@
 const app = require("./app");
-const cnonnectDb = require("./db/db.config");
+const connectDb = require("./db/db.config");
 
-cnonnectDb();
+connectDb();
 
 const PORT = 3000;
 app.listen(PORT, () => {

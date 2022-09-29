@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const { db } = require("../models/user.model");
 
-const cnonnectDb = async () => {
+const connectDb = async () => {
   try {
     const conn = await mongoose.connect(process.env.DB_URL_TEST, {
       useNewUrlParser: true,
@@ -13,4 +14,4 @@ const cnonnectDb = async () => {
   }
 };
 
-module.exports = cnonnectDb;
+module.exports = connectDb;

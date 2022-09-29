@@ -1,13 +1,14 @@
 const router = require("express").Router();
+const passport = require("passport");
 const {
   preSignUp,
-  signup,
-  login,
+  userRegistration,
+  userLogin,
 } = require("../controllers/user.auth.controller");
 
 router
-  .post("/signup", preSignUp)
-  .post("/register", signup)
-  .post("/login", login);
+  .post("/pre-signup", preSignUp)
+  .post("/register", userRegistration)
+  .post("/login", userLogin);
 
 module.exports = router;

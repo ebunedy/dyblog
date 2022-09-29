@@ -3,9 +3,11 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
 const { model, Schema } = mongoose;
+const ObjectId = Schema.ObjectId;
 
-const userModel = Schema(
+const userModel = new Schema(
   {
+    id: ObjectId,
     name: {
       type: String,
       required: [true, "please provide name"],
@@ -35,18 +37,14 @@ const userModel = Schema(
       minLength: 8,
       required: [true, "please provide password"],
     },
-    following: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    followers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    following: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    followers: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     about: {
       type: String,
     },
@@ -81,8 +79,6 @@ const userModel = Schema(
 
   { timestamp: true }
 );
-
-userModel.index({ following: 1, followers: 1 }, { unique: true });
 
 userModel.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);

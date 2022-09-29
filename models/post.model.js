@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 
 const { model, Schema } = mongoose;
+const ObjectId = Schema.ObjectId;
 
 const postModel = Schema(
   {
+    id: ObjectId,
     title: {
       type: String,
       required: [true, "please provide post title"],

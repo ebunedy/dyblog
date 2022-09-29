@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
+
 const { model, Schema } = mongoose;
+const ObjectId = Schema.ObjectId;
 
 const tagSchema = Schema(
   {
+    id: ObjectId,
     name: {
       type: String,
       trim: true,
