@@ -93,7 +93,7 @@ const userLogin = async (req, res, next) => {
         if (error) return next(error);
         const userInfoToken = userToken(user);
         const token = createToken({ payload: userInfoToken });
-        res.json({
+        res.status(StatusCodes.OK).json({
           message: "user logged in successfully",
           token,
         });

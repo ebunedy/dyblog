@@ -36,4 +36,16 @@ describe("User route", () => {
     expect(response.status).toBe(201);
     expect(response.body.name).toBe("New name");
   });
+
+  it("POST /api/v1/user-auth/login it log user in ", async () => {
+    const user = {
+      email: "a@gmail.com",
+      password: "test23488",
+    };
+    const response = await supertest(app)
+      .post("/api/v1/user-auth/login")
+      .send(user);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("user logged in successfully");
+  });
 });

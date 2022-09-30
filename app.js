@@ -29,7 +29,8 @@ app.use(passport.session());
 const authRouter = require("./routes/auth.user.route");
 
 app.get("/", (req, res) => {
-  res.send(`welcome to dyblog ${req.session}`);
+  console.log(req.session.cookie)
+  res.send(`welcome to dyblog ${req.session.cookie}`);
 });
 
 app.use("/api/v1/user-auth", authRouter);
