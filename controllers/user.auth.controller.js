@@ -71,7 +71,6 @@ const userRegistration = async (req, res) => {
   const isFirstUser = (await User.countDocuments({})) === 0;
   const userRole = isFirstUser ? "admin" : "user";
   req.body.role = userRole;
-  console.log(req.body);
 
   //regBody.role = userRole; //preregistration functionality
 
