@@ -4,9 +4,18 @@ const passport = require("passport");
 require("dotenv").config();
 const session = require("express-session");
 const sessionStore = require("./db/mongo-store");
+const cloudinary = require("cloudinary").v2;
+const fileUpload = require("express-fileupload");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API,
+  api_secret: process.env.CLOUD_SECRET,
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload({ useTempFiles: true }));
 
 app.use(
   session({
@@ -27,9 +36,10 @@ app.use(passport.session());
 
 /** application routes */
 const authRouter = require("./routes/auth.user.route");
+const fileUpload = require("express-fileupload");
 
 app.get("/", (req, res) => {
-  console.log(req.session.cookie)
+  console.log(req.session.cookie);
   res.send(`welcome to dyblog ${req.session.cookie}`);
 });
 
