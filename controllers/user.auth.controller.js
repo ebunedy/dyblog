@@ -14,9 +14,7 @@ const preSignUp = async (req, res) => {
   const { name, username, email, password } = req.body;
 
   const emailAlreadyExists = await User.findOne({ email }).select("email");
-  if (emailAlreadyExists) {
-    throw new BadrequestError("Email already taken");
-  }
+  if (emailAlreadyExists) throw new BadrequestError("Email already taken");
 
   const preToken = createPreAndResetToken({
     payload: { name, username, email, password },
@@ -91,6 +89,7 @@ const userLogin = async (req, res, next) => {
       }
       req.login(user, async (error) => {
         if (error) return next(error);
+        req.user = userToken(user);
         const userInfoToken = userToken(user);
         const token = createToken({ payload: userInfoToken });
         res.status(StatusCodes.OK).json({

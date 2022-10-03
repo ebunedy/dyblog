@@ -8,9 +8,7 @@ const { StatusCodes } = require("http-status-codes");
 const publicProfile = async (req, res) => {
   const username = req.params.username;
   const user = await User.findOne({ username }).select("-password");
-  if (!user) {
-    throw new NotFoundError("user not found");
-  }
+  if (!user) throw new NotFoundError("user not found");
   const postsByUser =
     (await Post.find({ postBy: user._id })
       .populate("categories", "_id name")
@@ -24,16 +22,12 @@ const publicProfile = async (req, res) => {
 
 const imageUpload = async (req, res) => {
   const file = req.files;
-  if (!file) {
-    throw new BadrequestError("no file upload");
-  }
-  if (!file.image.mimetype.startsWith("image")) {
+  if (!file) throw new BadrequestError("no file upload");
+  if (!file.image.mimetype.startsWith("image"))
     throw new BadrequestError("please upload image");
-  }
-  const maxSize = 1024 * 1024;
-  if (file.image.size > maxSize) {
-    throw new BadrequestError("Please upload image smaller 1MB");
-  }
+  const maxSize = (1024 * 1024) / 2;
+  if (file.image.size > maxSize)
+    throw new BadrequestError("Please upload image smaller than 500kb");
   const result = await cloudinary.uploader.upload(file.image.tempFilePath, {
     unique_filename: false,
     use_filename: true,
@@ -43,4 +37,16 @@ const imageUpload = async (req, res) => {
   return res.status(StatusCodes.OK).json({ src: result.secure_url });
 };
 
-module.exports = { publicProfile, imageUpload };
+const preUserUpdate = async (req, res) => {
+  const user = await User.find(req.user).select(
+    "-password -createdAt -updatedAt"
+  );
+  if (!user) throw new NotFoundError("user not found");
+  res.status(StatusCodes.OK).json({ user });
+};
+
+const userUpdate = async (req, res) => {
+
+};
+
+module.exports = { publicProfile, imageUpload, preUserUpdate };

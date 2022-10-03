@@ -21,6 +21,7 @@ const userModel = new Schema(
       minLength: 3,
       maxLength: 25,
       trim: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -68,6 +69,8 @@ const userModel = new Schema(
     },
     photo: {
       type: String,
+      required: true,
+      default: "/uploads/couch.jpeg",
     },
     role: {
       type: String,
