@@ -46,7 +46,21 @@ const preUserUpdate = async (req, res) => {
 };
 
 const userUpdate = async (req, res) => {
-
+  const user = await User.findByIdAndUpdate(req.user.userId, req.body);
+  if (!user) throw new BadrequestError("failed to update user");
+  res.status(StatusCodes.OK).json({ message: "user updated successfully" });
 };
 
-module.exports = { publicProfile, imageUpload, preUserUpdate };
+const deleteUser = async (req, res) => {
+  const user = await User.findByIdAndDelete(req.user.userId);
+  if (!user) throw new BadrequestError("failed to update user");
+  res.status(StatusCodes.OK).json({ message: "user deleted successfully" });
+};
+
+module.exports = {
+  publicProfile,
+  imageUpload,
+  preUserUpdate,
+  userUpdate,
+  deleteUser,
+};
