@@ -36,7 +36,6 @@ app.use(passport.session());
 
 /** application routes */
 const authRouter = require("./routes/auth.user.route");
-const fileUpload = require("express-fileupload");
 
 app.get("/", (req, res) => {
   console.log(req.session.cookie);

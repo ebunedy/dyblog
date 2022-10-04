@@ -53,8 +53,30 @@ const userUpdate = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const user = await User.findByIdAndDelete(req.user.userId);
-  if (!user) throw new BadrequestError("failed to update user");
+  if (!user) throw new BadrequestError("failed to delete user");
   res.status(StatusCodes.OK).json({ message: "user deleted successfully" });
+};
+
+const addFollowing = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.user.userId, {
+    $addToSet: { following: req.body.followId },
+  });
+  if (!user) throw BadrequestError("failed to add to your following");
+  const newFollowing = await User.findById(req.body.followId);
+  res
+    .status(StatusCodes)
+    .json({ message: `${newFollowing.username} added to your following` });
+};
+
+const addFollower = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.body.followId, {
+    $addToSet: { followers: req.user.userId },
+  });
+  if (!user) throw BadrequestError("failed to add to your following");
+  const newFollower = await User.findById(req.user.userId);
+  res
+    .status(StatusCodes)
+    .json({ message: `${newFollower.username} added to your followers` });
 };
 
 module.exports = {
@@ -63,4 +85,6 @@ module.exports = {
   preUserUpdate,
   userUpdate,
   deleteUser,
+  addFollowing,
+  addFollower,
 };

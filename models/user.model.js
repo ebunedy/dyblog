@@ -39,12 +39,20 @@ const userModel = new Schema(
       required: [true, "please provide password"],
     },
     following: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
     followers: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
     about: {
       type: String,
