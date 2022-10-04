@@ -61,22 +61,55 @@ const addFollowing = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.user.userId, {
     $addToSet: { following: req.body.followId },
   });
-  if (!user) throw BadrequestError("failed to add to your following");
+  if (!user) throw BadrequestError("failed to add to the list of following");
   const newFollowing = await User.findById(req.body.followId);
   res
     .status(StatusCodes)
-    .json({ message: `${newFollowing.username} added to your following` });
+    .json({
+      message: `${newFollowing.username} added to the list of following`,
+    });
 };
 
 const addFollower = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.body.followId, {
     $addToSet: { followers: req.user.userId },
   });
-  if (!user) throw BadrequestError("failed to add to your following");
+  if (!user)
+    throw BadrequestError("failed to add to the list of your followers");
   const newFollower = await User.findById(req.user.userId);
   res
     .status(StatusCodes)
-    .json({ message: `${newFollower.username} added to your followers` });
+    .json({
+      message: `${newFollower.username} added to the list of your followers`,
+    });
+};
+
+const removeFollowing = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.user.userId, {
+    $pull: { following: req.body.followId },
+  });
+  if (!user)
+    throw BadrequestError("failed to remove from the list of your following");
+  const newFollowing = await User.findById(req.body.followId);
+  res
+    .status(StatusCodes)
+    .json({
+      message: `${newFollowing.username} removed from the list of your following`,
+    });
+};
+
+const removeFollower = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.body.followId, {
+    $pull: { followers: req.user.userId },
+  });
+  if (!user)
+    throw BadrequestError("failed to remove from the list of followers");
+  const newFollower = await User.findById(req.user.userId);
+  res
+    .status(StatusCodes)
+    .json({
+      message: `${newFollower.username} removed from the list of your followers`,
+    });
 };
 
 module.exports = {
