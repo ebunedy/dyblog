@@ -103,4 +103,9 @@ const userLogin = async (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { preSignUp, userRegistration, userLogin };
+const logout = (req, res) => {
+  req.session.destroy();
+  res.status(StatusCodes.OK).json({ message: "user logged out" });
+};
+
+module.exports = { preSignUp, userRegistration, userLogin, logout };

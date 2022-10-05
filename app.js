@@ -36,12 +36,14 @@ app.use(passport.session());
 
 /** application routes */
 const authRouter = require("./routes/auth.user.route");
+const userRouter = require("./routes/user.routes");
+
+app.use("/api/v1/user-auth", authRouter);
+app.use("/api/v1/user", userRouter);
 
 app.get("/", (req, res) => {
   console.log(req.session.cookie);
   res.send(`welcome to dyblog ${req.session.cookie}`);
 });
-
-app.use("/api/v1/user-auth", authRouter);
 
 module.exports = app;

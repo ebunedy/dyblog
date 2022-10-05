@@ -78,7 +78,8 @@ const userModel = new Schema(
     photo: {
       type: String,
       required: true,
-      default: "/uploads/couch.jpeg",
+      default:
+        "https://res.cloudinary.com/duakyn1ou/image/upload/v1664969993/file-upload/tmp-1-1664969991069.jpg",
     },
     role: {
       type: String,

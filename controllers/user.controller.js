@@ -21,24 +21,28 @@ const publicProfile = async (req, res) => {
 };
 
 const imageUpload = async (req, res) => {
-  const file = req.files;
-  if (!file) throw new BadrequestError("no file upload");
-  if (!file.image.mimetype.startsWith("image"))
-    throw new BadrequestError("please upload image");
+  if (!req.files) throw new BadRequestError("No File Uploaded");
+
+  const image = req.files.image;
+  if (!image.mimetype.startsWith("image"))
+    throw new BadRequestError("please upload image");
+
   const maxSize = (1024 * 1024) / 2;
-  if (file.image.size > maxSize)
+
+  if (image.size > maxSize)
     throw new BadrequestError("Please upload image smaller than 500kb");
-  const result = await cloudinary.uploader.upload(file.image.tempFilePath, {
+
+  const result = await cloudinary.uploader.upload(image.tempFilePath, {
     unique_filename: false,
     use_filename: true,
     folder: "file-upload",
   });
-  fs.unlinkSync(file.image.tempFilePath);
+  fs.unlinkSync(image.tempFilePath);
   return res.status(StatusCodes.OK).json({ src: result.secure_url });
 };
 
 const preUserUpdate = async (req, res) => {
-  const user = await User.find(req.user).select(
+  const user = await User.find(req.user._id).select(
     "-password -createdAt -updatedAt"
   );
   if (!user) throw new NotFoundError("user not found");
@@ -46,70 +50,62 @@ const preUserUpdate = async (req, res) => {
 };
 
 const userUpdate = async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.user.userId, req.body);
+  const user = await User.findByIdAndUpdate(req.user._id, req.body, {});
   if (!user) throw new BadrequestError("failed to update user");
   res.status(StatusCodes.OK).json({ message: "user updated successfully" });
 };
 
 const deleteUser = async (req, res) => {
-  const user = await User.findByIdAndDelete(req.user.userId);
+  const user = await User.findByIdAndDelete(req.user._id);
   if (!user) throw new BadrequestError("failed to delete user");
   res.status(StatusCodes.OK).json({ message: "user deleted successfully" });
 };
 
 const addFollowing = async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.user.userId, {
+  const user = await User.findByIdAndUpdate(req.user._id, {
     $addToSet: { following: req.body.followId },
   });
   if (!user) throw BadrequestError("failed to add to the list of following");
   const newFollowing = await User.findById(req.body.followId);
-  res
-    .status(StatusCodes)
-    .json({
-      message: `${newFollowing.username} added to the list of following`,
-    });
+  res.status(StatusCodes).json({
+    message: `${newFollowing.username} added to the list of following`,
+  });
 };
 
 const addFollower = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.body.followId, {
-    $addToSet: { followers: req.user.userId },
+    $addToSet: { followers: req.user._id },
   });
   if (!user)
     throw BadrequestError("failed to add to the list of your followers");
-  const newFollower = await User.findById(req.user.userId);
-  res
-    .status(StatusCodes)
-    .json({
-      message: `${newFollower.username} added to the list of your followers`,
-    });
+  const newFollower = await User.findById(req.user._id);
+  res.status(StatusCodes).json({
+    message: `${newFollower.username} added to the list of your followers`,
+  });
 };
 
 const removeFollowing = async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.user.userId, {
+  const user = await User.findByIdAndUpdate(req.user._id, {
     $pull: { following: req.body.followId },
   });
   if (!user)
     throw BadrequestError("failed to remove from the list of your following");
   const newFollowing = await User.findById(req.body.followId);
-  res
-    .status(StatusCodes)
-    .json({
-      message: `${newFollowing.username} removed from the list of your following`,
-    });
+  res.status(StatusCodes).json({
+    message: `${newFollowing.username} removed from the list of your following`,
+  });
 };
 
 const removeFollower = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.body.followId, {
-    $pull: { followers: req.user.userId },
+    $pull: { followers: req.user._id },
   });
   if (!user)
     throw BadrequestError("failed to remove from the list of followers");
-  const newFollower = await User.findById(req.user.userId);
-  res
-    .status(StatusCodes)
-    .json({
-      message: `${newFollower.username} removed from the list of your followers`,
-    });
+  const newFollower = await User.findById(req.user._id);
+  res.status(StatusCodes).json({
+    message: `${newFollower.username} removed from the list of your followers`,
+  });
 };
 
 module.exports = {
@@ -120,4 +116,6 @@ module.exports = {
   deleteUser,
   addFollowing,
   addFollower,
+  removeFollowing,
+  removeFollower,
 };
