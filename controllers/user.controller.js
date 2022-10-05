@@ -7,7 +7,9 @@ const { StatusCodes } = require("http-status-codes");
 
 const publicProfile = async (req, res) => {
   const username = req.params.username;
-  const user = await User.findOne({ username }).select("-password");
+  const user = await User.findOne({ username })
+    .populate("following", "-password")
+    .select("-password");
   if (!user) throw new NotFoundError("user not found");
   const postsByUser =
     (await Post.find({ postBy: user._id })
@@ -50,6 +52,10 @@ const preUserUpdate = async (req, res) => {
 };
 
 const userUpdate = async (req, res) => {
+  if (req.body.password)
+    throw new BadrequestError(
+      "to update password, go to password reset page. update other fields"
+    );
   const user = await User.findByIdAndUpdate(req.user._id, req.body, {});
   if (!user) throw new BadrequestError("failed to update user");
   res.status(StatusCodes.OK).json({ message: "user updated successfully" });
@@ -67,8 +73,8 @@ const addFollowing = async (req, res) => {
   });
   if (!user) throw BadrequestError("failed to add to the list of following");
   const newFollowing = await User.findById(req.body.followId);
-  res.status(StatusCodes).json({
-    message: `${newFollowing.username} added to the list of following`,
+  res.status(StatusCodes.OK).json({
+    message: `${newFollowing?.username} added to the list of following`,
   });
 };
 
@@ -79,8 +85,8 @@ const addFollower = async (req, res) => {
   if (!user)
     throw BadrequestError("failed to add to the list of your followers");
   const newFollower = await User.findById(req.user._id);
-  res.status(StatusCodes).json({
-    message: `${newFollower.username} added to the list of your followers`,
+  res.status(StatusCodes.OK).json({
+    message: `${newFollower?.username} added to the list of your followers`,
   });
 };
 
@@ -91,8 +97,8 @@ const removeFollowing = async (req, res) => {
   if (!user)
     throw BadrequestError("failed to remove from the list of your following");
   const newFollowing = await User.findById(req.body.followId);
-  res.status(StatusCodes).json({
-    message: `${newFollowing.username} removed from the list of your following`,
+  res.status(StatusCodes.OK).json({
+    message: `${newFollowing?.username} removed from the list of your following`,
   });
 };
 
@@ -103,8 +109,8 @@ const removeFollower = async (req, res) => {
   if (!user)
     throw BadrequestError("failed to remove from the list of followers");
   const newFollower = await User.findById(req.user._id);
-  res.status(StatusCodes).json({
-    message: `${newFollower.username} removed from the list of your followers`,
+  res.status(StatusCodes.OK).json({
+    message: `${newFollower?.username} removed from the list of your followers`,
   });
 };
 
