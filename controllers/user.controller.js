@@ -62,7 +62,8 @@ const userUpdate = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const user = await User.findByIdAndDelete(req.user._id);
+  const { username } = req.body;
+  const user = await User.findOneAndDelete({ username });
   if (!user) throw new BadrequestError("failed to delete user");
   res.status(StatusCodes.OK).json({ message: "user deleted successfully" });
 };

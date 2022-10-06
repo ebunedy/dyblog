@@ -7,7 +7,8 @@ const userToken = (user) => {
 
 const userResetPasswordToken = (user) => {
   return {
-    username: user.email,
+    username: user.username,
+    email: user.email,
   };
 };
 

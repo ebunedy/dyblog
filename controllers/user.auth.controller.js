@@ -5,10 +5,35 @@ const passport = require("passport");
 const { NotFoundError, BadrequestError } = require("../errors/index");
 const {
   userToken,
+  userResetPasswordToken,
   createPreAndResetToken,
   decodePreAndResetToken,
   createToken,
 } = require("../utils/index");
+
+/** for production */
+const transporter = nodemail.createTransport({
+  service: "gmail", // change to host: emailengine smtp
+  secure: false, // use SSL. change to true or remvove in production
+  port: 25, // port for secure SMTP
+  auth: {
+    user: process.env.mail,
+    pass: process.env.pass,
+  },
+  tls: {
+    rejectUnauthorized: false, // you can remove tls
+  },
+});
+
+/** ethereal test */
+const etherealTransporter = nodemail.createTransport({
+  host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: 'stan45@ethereal.email',
+        pass: 'rPkA6RQcmDESuZTzas'
+    }
+});
 
 const preSignUp = async (req, res) => {
   const { name, username, email, password } = req.body;
@@ -18,19 +43,6 @@ const preSignUp = async (req, res) => {
 
   const preToken = createPreAndResetToken({
     payload: { name, username, email, password },
-  });
-
-  const transporter = nodemail.createTransport({
-    service: "gmail",
-    secure: false, // use SSL
-    port: 25, // port for secure SMTP
-    auth: {
-      user: process.env.mail,
-      pass: process.env.pass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
   });
 
   const mailOptions = {
@@ -51,7 +63,11 @@ const preSignUp = async (req, res) => {
       console.log(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    res.status(StatusCodes.OK).json({ message: "mail sent successfully" });
+    res
+      .status(StatusCodes.OK)
+      .json({
+        message: `mail sent to ${email}. click the link to activate your accout`,
+      });
   });
 };
 
@@ -68,7 +84,7 @@ const userRegistration = async (req, res) => {
   }*/
   const isFirstUser = (await User.countDocuments({})) === 0;
   const userRole = isFirstUser ? "admin" : "user";
-  req.body.role = userRole;
+  req.body.role = userRole; // switch in production
 
   //regBody.role = userRole; //preregistration functionality
 
@@ -108,4 +124,50 @@ const logout = (req, res) => {
   res.status(StatusCodes.OK).json({ message: "user logged out" });
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user)
+    throw new BadrequestError(
+      `user with ${email} does not exist. please register`
+    );
+  const resetTokenInfo = userResetPasswordToken(user);
+  const passwordResetToken = createPreAndResetToken({
+    payload: resetTokenInfo,
+  });
+  const mailOptions = {
+    from: process.env.mail,
+    to: email,
+    subject: `Password reset link`,
+    html: `
+    <p>Please use the link below to reset your password</p>
+    <p>${process.env.CLIENT_URL}/auth/account/password/reset/${passwordResetToken}</p>
+    <hr />
+    <p>This email may contain sensitive information</p>
+    <p>https://dyblog.com</p>
+   `,
+  };
+
+  user.resetPasswordLink = passwordResetToken;
+  await user.save();
+
+  transporter.sendMail(mailOptions, (err, mailInfo) => {
+    if (err) {
+      console.log(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    res
+      .status(StatusCodes.OK)
+      .json({
+        message: `Email has been sent to ${email}. Follow the instructions to reset your password. Link expires in 10min.`,
+      });
+  });
+};
+
+
+
 module.exports = { preSignUp, userRegistration, userLogin, logout };
+
+/**
+ * 
+ */

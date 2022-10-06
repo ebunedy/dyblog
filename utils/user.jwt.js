@@ -14,7 +14,7 @@ const decodeToken = (token) => {
 
 /** verify password reset token */
 const decodePreAndResetToken = (token) => {
-  return jsonwebtoken.verify(token, process.env.PASS_RESET_SECRET);
+  return jsonwebtoken.verify(token, process.env.RESET_PRE_SECRET);
 };
 
 /** create password reset token */
