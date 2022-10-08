@@ -26,14 +26,14 @@ const transporter = nodemail.createTransport({
 });
 
 /** ethereal test */
-const etherealTransporter = nodemail.createTransport({
-  host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-        user: 'stan45@ethereal.email',
-        pass: 'rPkA6RQcmDESuZTzas'
-    }
-});
+/*const etherealTransporter = nodemail.createTransport({
+  host: "smtp.ethereal.email",
+  port: 587,
+  auth: {
+    user: "stan45@ethereal.email",
+    pass: "rPkA6RQcmDESuZTzas",
+  },
+});*/
 
 const preSignUp = async (req, res) => {
   const { name, username, email, password } = req.body;
@@ -44,8 +44,11 @@ const preSignUp = async (req, res) => {
   const preToken = createPreAndResetToken({
     payload: { name, username, email, password },
   });
-
-  const mailOptions = {
+  res.status(StatusCodes.OK).json({ token: preToken });
+  /**
+   * email capability. for production
+   **/
+  /*const mailOptions = {
     from: process.env.mail,
     to: email,
     subject: `Account activation link`,
@@ -68,12 +71,12 @@ const preSignUp = async (req, res) => {
       .json({
         message: `mail sent to ${email}. click the link to activate your accout`,
       });
-  });
+  });*/
 };
 
 const userRegistration = async (req, res) => {
   /** the commmented code is for preregistration functionality */
-  /*const regToken = req.body.token;
+  const regToken = req.body.token;
   if (!regToken) {
     throw new BadrequestError("no registration token found");
   }
@@ -81,14 +84,16 @@ const userRegistration = async (req, res) => {
   const regBody = decodePreAndResetToken(regToken);
   if (!regBody) {
     throw new BadrequestError("expired registration token");
-  }*/
+  }
+
   const isFirstUser = (await User.countDocuments({})) === 0;
   const userRole = isFirstUser ? "admin" : "user";
-  req.body.role = userRole; // switch in production
+  //req.body.role = userRole; // switch in production
 
-  //regBody.role = userRole; //preregistration functionality
+  regBody.role = userRole; //preregistration functionality
 
-  const user = await User.create(req.body);
+  const user = await User.create(regBody);
+  if (!user) throw new BadrequestError("failed to create user");
   res
     .status(StatusCodes.CREATED)
     .json({ msg: "user created", name: user.name });
@@ -135,7 +140,9 @@ const forgotPassword = async (req, res) => {
   const passwordResetToken = createPreAndResetToken({
     payload: resetTokenInfo,
   });
-  const mailOptions = {
+
+  /** for email. */
+  /*const mailOptions = {
     from: process.env.mail,
     to: email,
     subject: `Password reset link`,
@@ -146,28 +153,50 @@ const forgotPassword = async (req, res) => {
     <p>This email may contain sensitive information</p>
     <p>https://dyblog.com</p>
    `,
-  };
+  };*/
 
   user.resetPasswordLink = passwordResetToken;
   await user.save();
 
+  res.status(StatusCodes.OK).json({ token: passwordResetToken });
+
+  /*
   transporter.sendMail(mailOptions, (err, mailInfo) => {
     if (err) {
       console.log(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    res
-      .status(StatusCodes.OK)
-      .json({
-        message: `Email has been sent to ${email}. Follow the instructions to reset your password. Link expires in 10min.`,
-      });
+    res.status(StatusCodes.OK).json({
+      message: `Email has been sent to ${email}. Follow the instructions to reset your password. Link expires in 10min.`,
+    });
   });
+  */
 };
 
+const changePassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password)
+    throw new BadrequestError("please enter new password");
+  const decodedToken = decodePreAndResetToken(token);
+  if (!decodedToken) throw new BadrequestError("expired token");
+  const user = await User.findOne(decodedToken);
+  if (!user) throw new BadrequestError("no user found. please as a user");
 
+  user.resetPasswordLink = "";
+  user.password = password;
+  await user.save();
+  res.json({ message: "password reset successfully. please login" });
+};
 
-module.exports = { preSignUp, userRegistration, userLogin, logout };
+module.exports = {
+  preSignUp,
+  userRegistration,
+  userLogin,
+  logout,
+  forgotPassword,
+  changePassword,
+};
 
 /**
- * 
+ *
  */

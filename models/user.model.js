@@ -82,7 +82,7 @@ const userModel = new Schema(
         "https://res.cloudinary.com/duakyn1ou/image/upload/v1664969993/file-upload/tmp-1-1664969991069.jpg",
     },
     resetPasswordLink: {
-      data: String,
+      type: String,
       default: "",
     },
     role: {
