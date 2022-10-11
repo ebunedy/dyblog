@@ -22,6 +22,7 @@ const userModel = new Schema(
       maxLength: 25,
       trim: true,
       unique: true,
+      lowercase: true,
     },
     email: {
       type: String,

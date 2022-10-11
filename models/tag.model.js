@@ -11,6 +11,8 @@ const tagSchema = Schema(
       trim: true,
       required: [true, "please provide tag name"],
       maxLength: 35,
+      unique: true,
+      lowercase: true,
     },
   },
   { timestamps: true }
