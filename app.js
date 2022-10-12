@@ -38,10 +38,12 @@ app.use(passport.session());
 const authRouter = require("./routes/auth.user.route");
 const userRouter = require("./routes/user.routes");
 const tagRouter = require("./routes/tag.route");
+const categoryRouter = require("./routes/category.route");
 
 app.use("/api/v1/user-auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/tag", tagRouter);
+app.use("/api/v1/category", categoryRouter);
 
 app.get("/", (req, res) => {
   console.log(req.session.cookie);

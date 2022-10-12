@@ -96,7 +96,7 @@ const userRegistration = async (req, res) => {
   if (!user) throw new BadrequestError("failed to create user");
   res
     .status(StatusCodes.CREATED)
-    .json({ msg: "user created", name: user.name });
+    .json({ message: "user created", name: user.name });
 };
 
 const userLogin = async (req, res, next) => {

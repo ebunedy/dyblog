@@ -4,12 +4,12 @@ const Post = require("../models/post.model");
 const { BadrequestError } = require("../errors");
 
 const createTag = async (req, res) => {
-  const { name } = req.body;
+  const name = req.body.name.toLowerCase();
   const tagExist = await Tag.findOne({ name });
   if (tagExist) throw new BadrequestError("tag is already available");
   const tag = await Tag.create({ name });
   if (!tag) throw new BadrequestError("failed to create tag");
-  res.status(StatusCodes.OK).json({ tag });
+  res.status(StatusCodes.OK).json({ message: "tag created successfully", tag });
 };
 //Lovedy55
 
@@ -21,18 +21,18 @@ const listTags = async (req, res) => {
 
 const postsByTags = async (req, res) => {
   const tagName = req.params.tag.toLowerCase();
+  const tag = await Post.findOne({ name: tagName });
+  if (!tag) throw new BadrequestError("no tag with that name");
 
-  const byTags = await Post.findOne({ tagName });
-  if (!byTags) throw new BadrequestError("no tag with that name");
   const posts =
-    (await Post.find({ tags: byTags._id })
+    (await Post.find({ tags: tag._id })
       .populate("categories")
       .populate("tags")
       .populate("postedBy", "_id, name, username")
       .select(
         "_id title body excerpt categories tags postedBy createdAt updatedAt"
       )) || [];
-  res.status(StatusCodes.OK).json({ posts });
+  res.status(StatusCodes.OK).json({ tag: tagName, posts });
 };
 
 const deleteTag = async (req, res) => {
