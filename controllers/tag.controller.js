@@ -20,7 +20,7 @@ const listTags = async (req, res) => {
 };
 
 const postsByTags = async (req, res) => {
-  const tagName = req.params.tag.toLowerCase();
+  const tagName = req.params.tagName.toLowerCase();
   const tag = await Post.findOne({ name: tagName });
   if (!tag) throw new BadrequestError("no tag with that name");
 
@@ -30,20 +30,20 @@ const postsByTags = async (req, res) => {
       .populate("tags")
       .populate("postedBy", "_id, name, username")
       .select(
-        "_id title body excerpt categories tags postedBy createdAt updatedAt"
+        "_id title excerpt categories tags postedBy createdAt updatedAt"
       )) || [];
   res.status(StatusCodes.OK).json({ tag: tagName, posts });
 };
 
 const deleteTag = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.tagId;
   const tag = await Tag.findByIdAndDelete(id);
   if (!tag) throw new BadrequestError("failed to delete tag");
   res.status(StatusCodes.OK).json({ message: "tag deleted successfully" });
 };
 
 const updateTag = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.tagId;
   const tag = await Tag.findByIdAndUpdate(id, { name: req.body.name });
   if (!tag) throw new BadrequestError("failed to update tag");
   res.status(StatusCodes.OK).json({ message: "tag updated successfully" });

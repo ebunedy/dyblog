@@ -16,11 +16,13 @@ const postModel = Schema(
     body: {
       type: String,
       required: [true, "please provide the body of your post"],
-      max: 2000000,
+      maxLength: 2000000,
+      minLength: 200,
     },
     excerpt: {
       type: String,
-      max: 1000,
+      required: true,
+      maxLength: 400,
     },
     averageRating: {
       type: Number,

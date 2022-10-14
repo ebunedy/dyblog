@@ -4,6 +4,6 @@ const smartTrim = (str, trimLength, delim, trimAppendix) => {
   let trimmedStrLastIndex = trimmedStr.lastIndexOf(delim);
   if (trimmedStrLastIndex >= 0)
     trimmedStr = trimmedStr.substr(0, trimmedStrLastIndex);
-  trimmedStr = +trimAppendix;
+  trimmedStr += trimAppendix;
   return trimmedStr;
 };

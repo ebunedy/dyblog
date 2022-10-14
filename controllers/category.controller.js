@@ -22,7 +22,7 @@ const listCategory = async (req, res) => {
 };
 
 const postsByCategories = async (req, res) => {
-  const categoryName = req.params.name.toLowerCase();
+  const categoryName = req.params.categoryName.toLowerCase();
   const category = await Category.findOne({ name: categoryName });
   if (!category) throw new BadrequestError("no category with that name");
 
@@ -32,13 +32,13 @@ const postsByCategories = async (req, res) => {
       .populate("tags")
       .populate("postedBy", "_id, name, username")
       .select(
-        "_id title body excerpt categories tags postedBy createdAt updatedAt"
+        "_id title excerpt categories tags postedBy createdAt updatedAt"
       )) || [];
   res.status(StatusCodes.OK).json({ category: categoryName, posts });
 };
 
 const updateCategory = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.categoryId;
   const category = await Category.findByIdAndUpdate(id, {
     name: req.body.name,
   });
@@ -47,7 +47,7 @@ const updateCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.categoryId;
   const category = await Category.findByIdAndDelete(id);
   if (!category) throw new BadrequestError("failed to delete category");
   res.status(StatusCodes.OK).json({ message: "category deleted successfully" });

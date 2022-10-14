@@ -7,8 +7,12 @@ const {
   deleteCategory,
 } = require("../controllers/category.controller");
 
-router.post("/create", createCategory).post("/update", updateCategory);
-router.get("/categories", listCategory).get("/:category", postsByCategories);
-router.delete("/delete/:category", deleteCategory);
+router
+  .post("/create", createCategory)
+  .patch("/update/:categoryName", updateCategory);
+router
+  .get("/categories", listCategory)
+  .get("categories/:categoryId", postsByCategories);
+router.delete("/delete/:categoryId", deleteCategory);
 
 module.exports = router;

@@ -8,14 +8,15 @@ const { StatusCodes } = require("http-status-codes");
 const publicProfile = async (req, res) => {
   const username = req.params.username;
   const user = await User.findOne({ username })
-    .populate("following", "-password")
-    .select("-password");
+    .populate("following", "-password -resetPasswordLink -role")
+    .populate("followers", "-password -resetPasswordLink -role")
+    .select("-password -resetPasswordLink -role");
   if (!user) throw new NotFoundError("user not found");
   const postsByUser =
-    (await Post.find({ postBy: user._id })
+    (await Post.find({ postedBy: user._id })
       .populate("categories", "_id name")
       .populate("tags", "_id name")
-      .populate("posteBy")
+      .populate("postedBy", "-password")
       .select(
         "_id title body excerpt categories tags postedBy createdAt updatedAt"
       )) || [];
