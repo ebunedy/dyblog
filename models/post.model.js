@@ -24,10 +24,6 @@ const postModel = Schema(
       required: true,
       maxLength: 400,
     },
-    averageRating: {
-      type: Number,
-      default: 0,
-    },
     image: {
       type: String,
       default:
@@ -51,6 +47,14 @@ const postModel = Schema(
       type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
+    },
+    likes: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+        },
+      ],
     },
   },
   { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } }

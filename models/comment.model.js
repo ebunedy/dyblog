@@ -10,14 +10,6 @@ const commentSchema = Schema(
       type: String,
       required: [true, "please provide your comment"],
     },
-    likes: {
-      type: Number,
-      default: 0,
-    },
-    rating: {
-      type: Number,
-      default: 0,
-    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -34,6 +26,7 @@ const commentSchema = Schema(
 
 commentSchema.index({ user: 1, post: 1 }, { unique: true });
 
+/* the code commented out is for average rating
 commentSchema.statics.averageRating = async function (postId) {
   const averageRating = await this.aggregate([
     { $match: { post: postId } },
@@ -51,6 +44,7 @@ commentSchema.statics.averageRating = async function (postId) {
     console.error(err);
   }
 };
+*/
 
 commentSchema.post("save", async function () {
   await this.constructor.averageRating(this.post);

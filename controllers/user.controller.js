@@ -57,7 +57,7 @@ const userUpdate = async (req, res) => {
     throw new BadrequestError(
       "to update password, go to password reset page. update other fields"
     );
-  const user = await User.findByIdAndUpdate(req.user._id, req.body, {});
+  const user = await User.findByIdAndUpdate(req.user._id, req.body);
   if (!user) throw new BadrequestError("failed to update user");
   res.status(StatusCodes.OK).json({ message: "user updated successfully" });
 };
@@ -73,7 +73,10 @@ const addFollowing = async (req, res) => {
   const user = await User.findByIdAndUpdate(req.user._id, {
     $addToSet: { following: req.body.followId },
   });
-  if (!user) throw BadrequestError("failed to add to the list of following");
+  if (!user)
+    throw BadrequestError(
+      "failed to add to the list of following. user you are trying to add does not exist"
+    );
   const newFollowing = await User.findById(req.body.followId);
   res.status(StatusCodes.OK).json({
     message: `${newFollowing?.username} added to the list of following`,
@@ -85,7 +88,9 @@ const addFollower = async (req, res) => {
     $addToSet: { followers: req.user._id },
   });
   if (!user)
-    throw BadrequestError("failed to add to the list of your followers");
+    throw new BadrequestError(
+      "failed to add to the list of your followers. user you are trying to add does not exist"
+    );
   const newFollower = await User.findById(req.user._id);
   res.status(StatusCodes.OK).json({
     message: `${newFollower?.username} added to the list of your followers`,

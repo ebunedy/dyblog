@@ -112,6 +112,28 @@ const deletePost = async (req, res) => {
   res.status(StatusCodes.OK).status({ message: "post deleted successfully" });
 };
 
+const addLike = async (req, res) => {
+  const { postId, userId } = req.body;
+  const post = await Post.findByIdAndUpdate(postId, {
+    $addToSet: { likes: userId },
+  });
+  if (!post) throw BadrequestError("failed to add like");
+  res.status(StatusCodes.OK).json({
+    message: `like added successfully`,
+  });
+};
+
+const removeLike = async (req, res) => {
+  const { postId, userId } = req.body;
+  const post = await Post.findByIdAndUpdate(postId, {
+    $pull: { likes: userId },
+  });
+  if (!post) throw BadrequestError("failed to remove like");
+  res.status(StatusCodes.OK).json({
+    message: `like removed successfully`,
+  });
+};
+
 module.exports = {
   createPost,
   allPosts,
@@ -121,4 +143,6 @@ module.exports = {
   prePostUpdate,
   updatePost,
   deletePost,
+  addLike,
+  removeLike,
 };
