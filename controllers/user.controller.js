@@ -14,7 +14,6 @@ const publicProfile = async (req, res) => {
   if (!user) throw new NotFoundError("user not found");
   const postsByUser =
     (await Post.find({ postedBy: user._id })
-      .populate("categories", "_id name")
       .populate("tags", "_id name")
       .populate("postedBy", "-password")
       .select(

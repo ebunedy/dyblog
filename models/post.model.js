@@ -29,13 +29,6 @@ const postModel = Schema(
       default:
         "https://res.cloudinary.com/duakyn1ou/image/upload/v1664970087/file-upload/tmp-1-1664970085576.jpg",
     },
-    categories: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-        required: true,
-      },
-    ],
     tags: [
       {
         type: Schema.Types.ObjectId,

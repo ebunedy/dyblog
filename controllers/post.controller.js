@@ -5,9 +5,9 @@ const { StatusCodes } = require("http-status-codes");
 const smartTrim = require("../helper/smart.trim");
 
 const createPost = async (req, res) => {
-  const { title, body, categories, tags } = req.body;
-  if (!title || !body || !categories || !tags)
-    throw new BadrequestError("title, body, categories, tags are all required");
+  const { title, body, tags } = req.body;
+  if (!title || !body || !tags)
+    throw new BadrequestError("title, body, tags are all required");
   req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
   req.body.postedBy = req.user._id;
   const { excerpt } = req.body;
@@ -41,7 +41,6 @@ const searchSortPaginatePosts = async (req, res) => {
 
   const posts =
     (await sortPosts
-      .populate("categories")
       .populate("tags")
       .populate("postedBy", "_id, name, username")
       .select("-createdAt -updatedAt")) || [];
@@ -52,7 +51,6 @@ const searchSortPaginatePosts = async (req, res) => {
 const allPosts = async (req, res) => {
   const posts =
     (await Post.find({})
-      .populate("categories")
       .populate("tags")
       .populate("postedBy", "_id, name, username")
       .sort("-createdAt")
@@ -63,7 +61,6 @@ const allPosts = async (req, res) => {
 const getSinglePost = async (req, res) => {
   const id = req.params.postId;
   const post = await Post.findById(id)
-    .populate("categories")
     .populate("tags")
     .populate("postedBy", "_id, name, username")
     .select("-excerpt");
@@ -72,14 +69,13 @@ const getSinglePost = async (req, res) => {
 };
 
 const relatedPost = async (req, res) => {
-  const { category, tag } = req.query;
+  const { tag } = req.query;
   const id = req.params.postId;
   const objectQuery = { _id: { $ne: id } };
-  if (category) objectQuery.categories = { $in: category };
   if (tags) objectQuery.tags = { $in: tag };
-  if (!tag || !category)
+  if (!tag)
     throw new BadrequestError(
-      "please provide either tag or category to get related post"
+      "please provide either a tag to get related post"
     );
   const posts = await Post.find(objectQuery);
   res.status(StatusCodes.OK).json({ relatedPosts: posts });
@@ -88,7 +84,6 @@ const relatedPost = async (req, res) => {
 const prePostUpdate = async (req, res) => {
   const id = req.params.postId;
   const post = await Post.findById(id)
-    .populate("categories")
     .populate("tags")
     .select("-excerpt");
   const tags = await Tag.find({});
@@ -98,15 +93,15 @@ const prePostUpdate = async (req, res) => {
 };
 
 const updatePost = async (req, res) => {
-  const id = req.params.tagId;
-  if (req.body) req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
+  const id = req.params.postId;
+  if (req.body.body) req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
   const post = await Post.findByIdAndUpdate(id, req.body);
   if (!post) throw new BadrequestError("failed to update post");
   res.status(StatusCodes.OK).json({ message: "post updated successfully" });
 };
 
 const deletePost = async (req, res) => {
-  const id = req.params.tagId;
+  const id = req.params.postId;
   const post = await Post.findByIdAndDelete(id);
   if (!post) throw new BadrequestError("failed to delete post");
   res.status(StatusCodes.OK).status({ message: "post deleted successfully" });
