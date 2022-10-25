@@ -9,7 +9,9 @@ const createTag = async (req, res) => {
   if (tagExist) throw new BadrequestError("tag is already available");
   const tag = await Tag.create({ name });
   if (!tag) throw new BadrequestError("failed to create tag");
-  res.status(StatusCodes.OK).json({ message: "tag created successfully", tag });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ message: "tag created successfully", tag });
 };
 //Lovedy55
 

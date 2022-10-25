@@ -19,7 +19,9 @@ const createPost = async (req, res) => {
 
   const post = await Post.create(req.body);
   if (!post) throw new BadrequestError("failed to create post");
-  res.status(StatusCodes.OK).json({ message: "post created successfully" });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ message: "post created successfully" });
 };
 
 const searchSortPaginatePosts = async (req, res) => {
@@ -83,9 +85,7 @@ const relatedPost = async (req, res) => {
 
 const prePostUpdate = async (req, res) => {
   const id = req.params.postId;
-  const post = await Post.findById(id)
-    .populate("tags")
-    .select("-excerpt");
+  const post = await Post.findById(id).populate("tags").select("-excerpt");
   const tags = await Tag.find({});
   if (!post) throw new BadrequestError("failed to fetch post");
   if (!tags) throw new BadrequestError("failed to fetch tags");
@@ -94,7 +94,8 @@ const prePostUpdate = async (req, res) => {
 
 const updatePost = async (req, res) => {
   const id = req.params.postId;
-  if (req.body.body) req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
+  if (req.body.body)
+    req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
   const post = await Post.findByIdAndUpdate(id, req.body);
   if (!post) throw new BadrequestError("failed to update post");
   res.status(StatusCodes.OK).json({ message: "post updated successfully" });

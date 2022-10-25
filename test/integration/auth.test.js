@@ -23,7 +23,7 @@ describe("User route", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it("POST /api/v1/user-auth/register it should return user creation ", async () => {
+  /*it("POST /api/v1/user-auth/register it should return user creation ", async () => {
     const user = {
       name: "New name",
       username: "namelove",
@@ -35,17 +35,17 @@ describe("User route", () => {
       .send(user);
     expect(response.status).toBe(201);
     expect(response.body.name).toBe("New name");
-  });
+  });*/
 
-  it("POST /api/v1/user-auth/login it log user in ", async () => {
+  /*it("POST /api/v1/user-auth/login it log user in ", async () => {
     const user = {
-      email: "a@gmail.com",
-      password: "test23488",
+      email: "dannyebuney@gmail.com",
+      password: "dyblog55",
     };
     const response = await supertest(app)
-      .post("/api/v1/user-auth/login")
+      .post("api/v1/user-auth/login")
       .send(user);
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("user logged in successfully");
-  });
+  });*/
 });
