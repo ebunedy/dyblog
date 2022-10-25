@@ -8,12 +8,12 @@ const createPost = async (req, res) => {
   const { title, body, tags } = req.body;
   if (!title || !body || !tags)
     throw new BadrequestError("title, body, tags are all required");
-  req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
+  req.body.excerpt = smartTrim(req.body.body, 380, "</p>", "...");
   req.body.postedBy = req.user._id;
   const { excerpt } = req.body;
   const postExist = await Post.findOne({ title, excerpt });
   if (postExist)
-    throw BadrequestError(
+    throw new BadrequestError(
       "post might already exist. please make changes to the post body"
     );
 
@@ -74,11 +74,12 @@ const relatedPost = async (req, res) => {
   const { tag } = req.query;
   const id = req.params.postId;
   const objectQuery = { _id: { $ne: id } };
-  if (tags) objectQuery.tags = { $in: tag };
   if (!tag)
     throw new BadrequestError(
       "please provide either a tag to get related post"
     );
+  const tagId = await Tag.find({ name: tag.toLowerCase() });
+  if (tagId) objectQuery.tags = { $in: tagId._id };
   const posts = await Post.find(objectQuery);
   res.status(StatusCodes.OK).json({ relatedPosts: posts });
 };
@@ -94,8 +95,11 @@ const prePostUpdate = async (req, res) => {
 
 const updatePost = async (req, res) => {
   const id = req.params.postId;
+  const postedBy = await Post.findById(id).select("postedBy");
+  if (postedBy !== req.user_id)
+    throw new BadrequestError("only the writter can update the post");
   if (req.body.body)
-    req.body.excerpt = smartTrim(req.body, 380, "</p>", " ...");
+    req.body.excerpt = smartTrim(req.body.body, 380, "</p>", " ...");
   const post = await Post.findByIdAndUpdate(id, req.body);
   if (!post) throw new BadrequestError("failed to update post");
   res.status(StatusCodes.OK).json({ message: "post updated successfully" });
@@ -103,15 +107,18 @@ const updatePost = async (req, res) => {
 
 const deletePost = async (req, res) => {
   const id = req.params.postId;
+  const postedBy = await Post.findById(id).select("postedBy");
+  if (postedBy !== req.user_id)
+    throw new BadrequestError("only the writter can delete the post");
   const post = await Post.findByIdAndDelete(id);
   if (!post) throw new BadrequestError("failed to delete post");
   res.status(StatusCodes.OK).status({ message: "post deleted successfully" });
 };
 
 const addLike = async (req, res) => {
-  const { postId, userId } = req.body;
-  const post = await Post.findByIdAndUpdate(postId, {
-    $addToSet: { likes: userId },
+  const id = req.params.postId;
+  const post = await Post.findByIdAndUpdate(id, {
+    $addToSet: { likes: req.user._id },
   });
   if (!post) throw BadrequestError("failed to add like");
   res.status(StatusCodes.OK).json({

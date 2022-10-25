@@ -3,7 +3,9 @@ const smartTrim = (str, trimLength, delim, trimAppendix) => {
   let trimmedStr = str.substr(0, trimLength + delim.length);
   let trimmedStrLastIndex = trimmedStr.lastIndexOf(delim);
   if (trimmedStrLastIndex >= 0)
-    trimmedStr = trimmedStr.substr(0, trimmedStrLastIndex);
-  trimmedStr += trimAppendix;
+    trimmedStr = trimmedStr.substr(0, trimmedStrLastIndex) + trimAppendix;
+  if (trimmedStrLastIndex == -1) trimmedStr = trimmedStr + trimAppendix + delim;
   return trimmedStr;
 };
+
+module.exports = smartTrim;

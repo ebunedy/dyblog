@@ -11,12 +11,15 @@ const {
   deletePost,
 } = require("../controllers/post.controller");
 
-router.post("/create", createPost).patch("/update/:postId", updatePost);
+router
+  .post("/create", createPost)
+  .patch("/update/:postId", updatePost)
+  .patch("/add-like/:postId", updatePost);
 router
   .get("/posts", allPosts)
-  .get("pre-update", prePostUpdate)
-  .get("search/:postId", searchSortPaginatePosts)
-  .get("related-posts/:postId", relatedPost)
+  .get("/pre-update/:postId", prePostUpdate)
+  .get("/related-posts/:postId", relatedPost)
+  .get("/search/:postId", searchSortPaginatePosts)
   .get("/:postId", getSinglePost);
 router.delete("/delete/:postId", deletePost);
 

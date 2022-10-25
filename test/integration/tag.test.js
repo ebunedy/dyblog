@@ -18,14 +18,14 @@ afterEach((done) => {
 });
 
 describe("Tag route", () => {
-  it("POST /api/v1/tag/create it should return success message ", async () => {
+  /*it("POST /api/v1/tag/create it should return success message ", async () => {
     const tag = {
-      name: "React",
+      name: "linux",
     };
     const response = await supertest(app).post("/api/v1/tag/create").send(tag);
     expect(response.status).toBe(201);
     expect(response.body.message).toBe("tag created successfully");
-  });
+  });*/
 
   it("GET /api/v1/tag/tags it should return all the tags ", async () => {
     const response = await supertest(app).get("/api/v1/tag/tags");
@@ -37,7 +37,7 @@ describe("Tag route", () => {
     expect(response.statusCode).toBe(200);
   });*/
 
-  it("UPDATE /api/v1/tag/update/6356f305676e46a177ef9e5a it should delete the tag with this id ", async () => {
+  /*it("UPDATE /api/v1/tag/update/6356f305676e46a177ef9e5a it should delete the tag with this id ", async () => {
     const tag = {
       name: "Javascript",
     };
@@ -45,12 +45,12 @@ describe("Tag route", () => {
       .patch("/api/v1/tag/update/6356f305676e46a177ef9e5a")
       .send(tag);
     expect(response.statusCode).toBe(200);
-  });
+  });*/
 
-  it("DELETE /api/v1/tag/delete/6356e2bd9cb3f98ce6ecc1d6 it should delete the tag with this id ", async () => {
+  /*it("DELETE /api/v1/tag/delete/6356e2bd9cb3f98ce6ecc1d6 it should delete the tag with this id ", async () => {
     const response = await supertest(app).delete(
       "/api/v1/tag/delete/6356e2bd9cb3f98ce6ecc1d6"
     );
     expect(response.statusCode).toBe(200);
-  });
+  });*/
 });
