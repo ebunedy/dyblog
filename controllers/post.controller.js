@@ -9,7 +9,7 @@ const createPost = async (req, res) => {
   if (!title || !body || !tags)
     throw new BadrequestError("title, body, tags are all required");
   req.body.excerpt = smartTrim(req.body.body, 380, "</p>", "...");
-  req.body.postedBy = req.user._id;
+  req.body.author = req.user._id;
   const { excerpt } = req.body;
   const postExist = await Post.findOne({ title, excerpt });
   if (postExist)
@@ -25,27 +25,28 @@ const createPost = async (req, res) => {
 };
 
 const searchSortPaginatePosts = async (req, res) => {
-  const { search, sort } = req.query;
+  const { search, sort, author, read_count, reading_time } = req.query;
   const queryObject = {};
   if (search)
     queryObject.$or = [
       { title: { $regex: search, $options: "i" } },
-      { body: { $regex: search, $options: "i" } },
+      { tags: { $regex: search, $options: "i" } },
+      { author: { $regex: search, $options: "i" } },
     ];
   let sortPosts = Post.find(queryObject);
-  if (sort === "latest") sortPosts = sortPosts.sort("-createdAt");
-  if (sort === "oldest") sortPosts = sortPosts.sort("createdAt");
+  const lowercaseSort = sort.toLowerCase();
+  if (lowercaseSort === "latest") sortPosts = sortPosts.sort("-createdAt");
+  if (lowercaseSort === "oldest") sortPosts = sortPosts.sort("createdAt");
 
   const page = Number(req.query.page) || 1;
   const limit = 20;
   const skip = (page - 1) * limit;
   sortPosts = sortPosts.skip(skip).limit(limit);
 
-  const posts =
-    (await sortPosts
-      .populate("tags")
-      .populate("postedBy", "_id, name, username")
-      .select("-createdAt -updatedAt"));
+  const posts = await sortPosts
+    .populate("tags")
+    .populate("author", "_id, name, username")
+    .select("-createdAt -updatedAt");
 
   res.status(StatusCodes.OK).json({ posts });
 };
@@ -54,7 +55,7 @@ const allPosts = async (req, res) => {
   const posts =
     (await Post.find({})
       .populate("tags")
-      .populate("postedBy", "_id, name, username")
+      .populate("author", "_id, name, username")
       .sort("-createdAt")
       .select("-createdAt -updatedAt")) || [];
   res.status(StatusCodes.OK).json({ posts });
@@ -64,9 +65,11 @@ const getSinglePost = async (req, res) => {
   const id = req.params.postId;
   const post = await Post.findById(id)
     .populate("tags")
-    .populate("postedBy", "_id, name, username")
+    .populate("author", "_id, name, username")
     .select("-excerpt");
   if (!post) throw new BadrequestError("failed to fetch post");
+  post.read_count += 1;
+  await post.save();
   res.status(StatusCodes.OK).json({ post });
 };
 
@@ -107,8 +110,8 @@ const updatePost = async (req, res) => {
 
 const deletePost = async (req, res) => {
   const id = req.params.postId;
-  const postedBy = await Post.findById(id).select("postedBy");
-  if (postedBy !== req.user_id)
+  const author = await Post.findById(id).select("author");
+  if (author !== req.user_id)
     throw new BadrequestError("only the writter can delete the post");
   const post = await Post.findByIdAndDelete(id);
   if (!post) throw new BadrequestError("failed to delete post");

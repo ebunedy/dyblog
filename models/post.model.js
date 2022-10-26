@@ -51,7 +51,7 @@ const postModel = Schema(
         required: true,
       },
     ],
-    postedBy: {
+    author: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "User",

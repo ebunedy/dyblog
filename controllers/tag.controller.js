@@ -30,10 +30,10 @@ const postsByTags = async (req, res) => {
     (await Post.find({ tags: tag._id })
       .populate("categories")
       .populate("tags")
-      .populate("postedBy", "_id, name, username")
+      .populate("author", "_id, name, username")
       .select(
-        "_id title excerpt categories tags postedBy createdAt updatedAt"
-      )) || [];
+        "_id title excerpt categories tags author createdAt updatedAt"
+      ));
   res.status(StatusCodes.OK).json({ tag: tagName, posts });
 };
 

@@ -13,7 +13,7 @@ const userPublicProfile = async (req, res) => {
     .select("-password -resetPasswordLink -role");
   if (!user) throw new NotFoundError("user not found");
   let postsByUser = Post.find({
-    postedBy: user._id,
+    author: user._id,
     state: "published",
   }).sort("-createdAt");
 
@@ -23,9 +23,7 @@ const userPublicProfile = async (req, res) => {
   postsByUser = postsByUser.skip(skip).limit(limit);
   const sortedPostsByUser = await postsByUser
     .populate("tags", "_id name")
-    .select(
-      "_id title body excerpt categories tags postedBy createdAt updatedAt"
-    );
+    .select("_id title excerpt categories tags author createdAt updatedAt");
   res.status(StatusCodes.OK).json({ user, posts: sortedPostsByUser });
 };
 
@@ -52,9 +50,7 @@ const userProfile = async (req, res) => {
     postsByUser = postsByUser.skip(skip).limit(limit);
     const sortedPostsByUser = await postsByUser
       .populate("tags", "_id name")
-      .select(
-        "_id title body excerpt categories tags postedBy createdAt updatedAt"
-      );
+      .select("_id title excerpt categories tags author createdAt updatedAt");
     res.status(StatusCodes.OK).json({ user, posts: sortedPostsByUser });
   }
 };
