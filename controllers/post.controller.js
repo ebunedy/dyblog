@@ -25,19 +25,29 @@ const createPost = async (req, res) => {
 };
 
 const searchSortPaginatePosts = async (req, res) => {
-  const { search, sort, author, read_count, reading_time } = req.query;
+  const { search, date_created, author, read_count, reading_time } = req.query;
   const queryObject = {};
   if (search)
     queryObject.$or = [
       { title: { $regex: search, $options: "i" } },
-      { tags: { $regex: search, $options: "i" } },
-      { author: { $regex: search, $options: "i" } },
+      { body: { $regex: search, $options: "i" } },
+      {
+        /*author: { $regex: search, $options: "i" }*/
+      },
     ];
   let sortPosts = Post.find(queryObject);
-  const lowercaseSort = sort.toLowerCase();
-  if (lowercaseSort === "latest") sortPosts = sortPosts.sort("-createdAt");
-  if (lowercaseSort === "oldest") sortPosts = sortPosts.sort("createdAt");
+  const lowercaseSort = date_created?.toLowerCase();
+  const lowercaseAuthor = author?.toLowerCase();
+  const lowercaseReadCount = read_count?.toLowerCase();
+  const sortObject = {};
+  if (lowercaseSort === "latest") sortObject.createdAt = -1;
+  if (lowercaseSort === "oldest") sortObject.createdAt = 1;
+  if (lowercaseAuthor === "z-a") sortObject.createdAt = 1;
+  if (lowercaseAuthor === "a-z") sortObject.createdAt = -1;
+  if (lowercaseReadCount === "descending") sortObject.createdAt = 1;
+  if (lowercaseReadCount === "ascending") sortObject.createdAt = -1;
 
+  sortPosts = sortPosts.sort(sortObject);
   const page = Number(req.query.page) || 1;
   const limit = 20;
   const skip = (page - 1) * limit;
@@ -45,8 +55,7 @@ const searchSortPaginatePosts = async (req, res) => {
 
   const posts = await sortPosts
     .populate("tags")
-    .populate("author", "_id, name, username")
-    .select("-createdAt -updatedAt");
+    .populate("author", "_id name username");
 
   res.status(StatusCodes.OK).json({ posts });
 };
@@ -55,7 +64,7 @@ const allPosts = async (req, res) => {
   const posts =
     (await Post.find({})
       .populate("tags")
-      .populate("author", "_id, name, username")
+      .populate("author", "_id name username")
       .sort("-createdAt")
       .select("-createdAt -updatedAt")) || [];
   res.status(StatusCodes.OK).json({ posts });
@@ -65,7 +74,7 @@ const getSinglePost = async (req, res) => {
   const id = req.params.postId;
   const post = await Post.findById(id)
     .populate("tags")
-    .populate("author", "_id, name, username")
+    .populate("author", "_id name username")
     .select("-excerpt");
   if (!post) throw new BadrequestError("failed to fetch post");
   post.read_count += 1;

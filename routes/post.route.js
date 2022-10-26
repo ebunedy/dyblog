@@ -19,7 +19,7 @@ router
   .get("/posts", allPosts)
   .get("/pre-update/:postId", prePostUpdate)
   .get("/related-posts/:postId", relatedPost)
-  .get("/search/:postId", searchSortPaginatePosts)
+  .get("/search", searchSortPaginatePosts)
   .get("/:postId", getSinglePost);
 router.delete("/delete/:postId", deletePost);
 
