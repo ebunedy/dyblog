@@ -45,7 +45,7 @@ const searchSortPaginatePosts = async (req, res) => {
     (await sortPosts
       .populate("tags")
       .populate("postedBy", "_id, name, username")
-      .select("-createdAt -updatedAt")) || [];
+      .select("-createdAt -updatedAt"));
 
   res.status(StatusCodes.OK).json({ posts });
 };

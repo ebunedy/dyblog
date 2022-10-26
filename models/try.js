@@ -12,7 +12,7 @@ const userModel = new Schema(
       type: String,
       required: [true, "please provide name"],
       minLength: 3,
-      maxLength: 50,
+      maxLength: 32,
       trim: true,
     },
     username: {

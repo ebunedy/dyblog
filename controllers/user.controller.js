@@ -5,21 +5,58 @@ const fs = require("fs");
 const { BadrequestError, NotFoundError } = require("../errors/index");
 const { StatusCodes } = require("http-status-codes");
 
-const publicProfile = async (req, res) => {
+const userPublicProfile = async (req, res) => {
   const username = req.params.username;
   const user = await User.findOne({ username })
     .populate("following", "-password -resetPasswordLink -role")
     .populate("followers", "-password -resetPasswordLink -role")
     .select("-password -resetPasswordLink -role");
   if (!user) throw new NotFoundError("user not found");
-  const postsByUser =
-    (await Post.find({ postedBy: user._id })
+  let postsByUser = Post.find({
+    postedBy: user._id,
+    state: "published",
+  }).sort("-createdAt");
+
+  const page = Number(req.query.page) || 1;
+  const limit = 20;
+  const skip = (page - 1) * limit;
+  postsByUser = postsByUser.skip(skip).limit(limit);
+  const sortedPostsByUser = await postsByUser
+    .populate("tags", "_id name")
+    .select(
+      "_id title body excerpt categories tags postedBy createdAt updatedAt"
+    );
+  res.status(StatusCodes.OK).json({ user, posts: sortedPostsByUser });
+};
+
+const userProfile = async (req, res) => {
+  const { state } = req.query;
+  if (req.user === undefined) {
+    res.json({ message: "you have to be logged in to see this page" });
+  } else {
+    const user = await User.findById(req.user._id)
+      .populate("following", "-password -resetPasswordLink -role")
+      .populate("followers", "-password -resetPasswordLink -role")
+      .select("-password -resetPasswordLink -role");
+    if (!user) throw new NotFoundError("user not found");
+
+    const queryObject = {
+      postedBy: user._id,
+    };
+
+    if (state) queryObject.state = state.toLowerCase();
+    let postsByUser = Post.find(queryObject).sort("-createdAt");
+    const page = Number(req.query.page) || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+    postsByUser = postsByUser.skip(skip).limit(limit);
+    const sortedPostsByUser = await postsByUser
       .populate("tags", "_id name")
-      .populate("postedBy", "-password")
       .select(
         "_id title body excerpt categories tags postedBy createdAt updatedAt"
-      )) || [];
-  res.status(StatusCodes.OK).json({ user, posts: postsByUser });
+      );
+    res.status(StatusCodes.OK).json({ user, posts: sortedPostsByUser });
+  }
 };
 
 const imageUpload = async (req, res) => {
@@ -121,7 +158,8 @@ const removeFollower = async (req, res) => {
 };
 
 module.exports = {
-  publicProfile,
+  userPublicProfile,
+  userProfile,
   imageUpload,
   preUserUpdate,
   userUpdate,

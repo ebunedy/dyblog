@@ -12,6 +12,7 @@ const postModel = Schema(
       minLength: 5,
       maxLength: 200,
       trim: true,
+      unique: true,
     },
     body: {
       type: String,
@@ -23,6 +24,20 @@ const postModel = Schema(
       type: String,
       required: true,
       maxLength: 400,
+    },
+    read_count: {
+      type: Number,
+      default: 0,
+    },
+    reading_time: {
+      type: Number,
+      default: 0,
+    },
+    state: {
+      type: String,
+      required: [true, "please provide a post state"],
+      enum: ["draft", "published"],
+      default: "draft",
     },
     image: {
       type: String,

@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const passport = require("passport");
 const {
-  publicProfile,
+  userPublicProfile,
+  userProfile,
   imageUpload,
   preUserUpdate,
   userUpdate,
@@ -27,7 +28,8 @@ router
   ]);
 router
   .get("/pre-update", [passport.authenticate("session"), preUserUpdate])
-  .get("/profile/:username", publicProfile);
+  .get("/profile/:username", userPublicProfile)
+  .get("/profile", userProfile);
 router.delete("delete/:username", deleteUser);
 
 module.exports = router;
