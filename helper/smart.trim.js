@@ -9,3 +9,8 @@ const smartTrim = (str, trimLength, delim, trimAppendix) => {
 };
 
 module.exports = smartTrim;
+
+
+/**
+ * "<h2>Introduction</h2>..</p>".replace(/<\/*[a-zA-Z0-9]+>/g, ' ').replace(/^\s|\s$/g, '').split(/\s+/)
+ */

@@ -89,4 +89,11 @@ describe("Post route", () => {
     );
     expect(response.status).toBe(200);
   });
+
+  it("Get /api/v1/post/search it should return searched and sorted posts", async () => {
+    const response = await supertest(app).patch(
+      "/api/v1/post/search"
+    );
+    expect(response.status).toBe(200);
+  });
 });

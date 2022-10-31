@@ -3,13 +3,15 @@ const Tag = require("../models/tag.model");
 const { BadrequestError } = require("../errors/index");
 const { StatusCodes } = require("http-status-codes");
 const smartTrim = require("../helper/smart.trim");
+const readTime = require("../helper/read.time");
 
 const createPost = async (req, res) => {
   const { title, body, tags } = req.body;
   if (!title || !body || !tags)
     throw new BadrequestError("title, body, tags are all required");
-  req.body.excerpt = smartTrim(req.body.body, 380, "</p>", "...");
+  req.body.excerpt = smartTrim(body, 380, "</p>", "...");
   req.body.author = req.user._id;
+  readTime(body, title, req);
   const { excerpt } = req.body;
   const postExist = await Post.findOne({ title, excerpt });
   if (postExist)
