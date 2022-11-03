@@ -109,11 +109,13 @@ const prePostUpdate = async (req, res) => {
 
 const updatePost = async (req, res) => {
   const id = req.params.postId;
-  const postedBy = await Post.findById(id).select("postedBy");
-  if (postedBy !== req.user_id)
+  const author = await Post.findById(id).select("author title");
+  if (author?.author.toString() !== req.user._id.toString())
     throw new BadrequestError("only the writter can update the post");
-  if (req.body.body)
+  if (req.body.body){
     req.body.excerpt = smartTrim(req.body.body, 380, "</p>", " ...");
+    readTime(body, author.title, req);
+  }
   const post = await Post.findByIdAndUpdate(id, req.body);
   if (!post) throw new BadrequestError("failed to update post");
   res.status(StatusCodes.OK).json({ message: "post updated successfully" });
@@ -122,7 +124,7 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   const id = req.params.postId;
   const author = await Post.findById(id).select("author");
-  if (author !== req.user_id)
+  if (author?.author.toString() !== req.user._id.toString())
     throw new BadrequestError("only the writter can delete the post");
   const post = await Post.findByIdAndDelete(id);
   if (!post) throw new BadrequestError("failed to delete post");
@@ -141,9 +143,9 @@ const addLike = async (req, res) => {
 };
 
 const removeLike = async (req, res) => {
-  const { postId, userId } = req.body;
+  const id = req.params.postId;
   const post = await Post.findByIdAndUpdate(postId, {
-    $pull: { likes: userId },
+    $pull: { likes: req.user._id },
   });
   if (!post) throw BadrequestError("failed to remove like");
   res.status(StatusCodes.OK).json({

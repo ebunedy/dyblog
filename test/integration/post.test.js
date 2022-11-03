@@ -73,7 +73,7 @@ describe("Post route", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Post /api/v1/post/update/6357ff7ffc443e5a4c7ae496 it should update posts", async () => {
+  it("Post /api/v1/post/update/6357ff7ffc443e5a4c7ae496 it should update a post", async () => {
     const newpost = {
       title: "Linux find Command Usage",
     };
@@ -83,17 +83,29 @@ describe("Post route", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Post /api/v1/post/add-like/6357ff7ffc443e5a4c7ae496 it should update posts", async () => {
+  it("Post /api/v1/post/delete/6357ff7ffc443e5a4c7ae496 it should delete a post", async () => {
+    const response = await supertest(app).delete(
+      "/api/v1/post/delete/6357ff7ffc443e5a4c7ae496"
+    );
+    expect(response.status).toBe(200);
+  });
+
+  it("Post /api/v1/post/add-like/6357ff7ffc443e5a4c7ae496 it should add like to a post", async () => {
     const response = await supertest(app).patch(
       "/api/v1/post/add-like/6357ff7ffc443e5a4c7ae496"
     );
     expect(response.status).toBe(200);
   });
 
-  it("Get /api/v1/post/search it should return searched and sorted posts", async () => {
+  it("Post /api/v1/post/remove-like/6357ff7ffc443e5a4c7ae496 it should remove like to a post", async () => {
     const response = await supertest(app).patch(
-      "/api/v1/post/search"
+      "/api/v1/post/remove-like/6357ff7ffc443e5a4c7ae496"
     );
+    expect(response.status).toBe(200);
+  });
+
+  it("Get /api/v1/post/search it should return searched and sorted posts", async () => {
+    const response = await supertest(app).get("/api/v1/post/search");
     expect(response.status).toBe(200);
   });
 });

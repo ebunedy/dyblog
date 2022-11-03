@@ -39,7 +39,7 @@ const userProfile = async (req, res) => {
     if (!user) throw new NotFoundError("user not found");
 
     const queryObject = {
-      postedBy: user._id,
+      author: user._id,
     };
 
     if (state) queryObject.state = state.toLowerCase();

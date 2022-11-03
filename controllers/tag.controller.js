@@ -23,17 +23,13 @@ const listTags = async (req, res) => {
 
 const postsByTags = async (req, res) => {
   const tagName = req.params.tagName.toLowerCase();
-  const tag = await Post.findOne({ name: tagName });
+  const tag = await Tag.findOne({ name: tagName });
   if (!tag) throw new BadrequestError("no tag with that name");
 
-  const posts =
-    (await Post.find({ tags: tag._id })
-      .populate("categories")
-      .populate("tags")
-      .populate("author", "_id, name, username")
-      .select(
-        "_id title excerpt categories tags author createdAt updatedAt"
-      ));
+  const posts = await Post.find({ tags: tag._id })
+    .populate("tags")
+    .populate("author", "name username")
+    .select("_id title excerpt tags author createdAt updatedAt");
   res.status(StatusCodes.OK).json({ tag: tagName, posts });
 };
 
